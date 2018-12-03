@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<canvas id="canvas" width="400" height="400"></canvas>
+<script>
+let test = 'testtesttest'
+
+function eee() {
+    let c = document.createElement("canvas");
+    const ctx = c.getContext("2d");
+    c.width = c.height = 200;
+    ctx.font = "50px Arial Black, Arial";
+    ctx.fillStyle = 'red';
+    ctx.textAlign = "center";
+    ctx.fillText(test, 50, 50);
+    return c
+}
+
+var ctx = document.getElementById('canvas').getContext('2d');
+// ctx.font = "50px Arial Black, Arial";
+// ctx.fillStyle = 'red';
+// ctx.textAlign = "center";
+// ctx.fillText('test', 50,50);
+ctx.beginPath();
+ctx.save()
+var image = eee()
+ctx.drawImage(image, 0, 0);
+ctx.restore()
+
+
+var x = 1
+const run = () => {
+    // debugger
+    setInterval(run,500);
+    ctx.clearRect(0, 0, 400, 400);
+    // ctx.save()
+    x++
+    test += x
+    var image = eee()
+    ctx.translate(0, 0);
+    ctx.rotate(Math.PI /4)
+    ctx.drawImage(image, 100, 100);
+    // ctx.restore()
+}
+
+run();
+
+
+</script>
+</body>
+</html>

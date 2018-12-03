@@ -1,0 +1,106 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>demo</title>
+
+<style type="text/css">
+.b_10_3 {
+		overflow: hidden; text-align:center;
+		background:#999;
+ }
+.b_10_3 span {
+	float: left; font-size:16px; line-height:2em;
+}
+.b_10_3 span.bold {
+	font-weight:bold;
+}
+.b_10_3 span:nth-child(1) {
+	width: 35%;
+	text-align: center;
+}
+.b_10_3 span:nth-child(2) {
+	width: 30%;
+	text-align: left;
+}
+.b_10_3 span:nth-child(3) {
+	width: 35%;
+	text-align: left;
+}
+.b_10_3 span:nth-child(4) {
+	width: 35%;
+	text-align: right;
+}
+.b_10_3 span:nth-child(5) {
+	width: 25%;
+	text-align: right;
+}
+.b_10_3 span:nth-child(6) {
+	width: 25%;
+	text-align: right;
+}
+.b_10_3 span:nth-child(7) {
+	width: 50%;
+	text-align: center;
+}
+.b_10_3 span:nth-child(8) {
+	width: 30%;
+	text-align: center;
+}
+.b_10_3 span:nth-child(9) {
+	width: 50%;
+	text-align: right;
+}
+.b_10_3 span:nth-child(10) {
+	width: 40%;
+	text-align: right;
+}
+</style>
+
+<script type="text/javascript" src="jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="tagcanvas.min.js"></script>
+<script type="text/javascript">
+window.onload = function () {
+	try {
+		var i, et = document.getElementById('tags').childNodes;
+		for (i in et) {
+			et[i].nodeName == 'A' && et[i].addEventListener('click', function (e) {
+				e.preventDefault();
+			});
+		}
+
+		TagCanvas.Start('myCanvas', 'tags', {
+			textColour: '#222',
+			outlineColour: '#fff',
+			reverse: true,
+			depth: 0.8,
+			dragControl: true,
+			decel:0.95,
+			maxSpeed: 0.05,
+			initial: [-0.2, 0]
+		});
+	} catch (e) {
+		// something went wrong, hide the canvas container
+		//document.getElementById('myCanvasContainer').style.display = 'none';
+	}
+};
+</script>
+
+</head>
+
+<body>
+
+<div class="b_10_3">
+
+	<canvas width="300" height="300" id="myCanvas"></canvas>
+	
+	<div id="tags">
+		<a href="#">爱</a>
+		<a href="#">承诺</a><a href="#">轻时尚</a><a href="#">简约</a><a href="#">科技</a>
+		<a href="#">美丽</a><a href="#">智慧</a><a href="#">情感</a><a href="#">体验</a><a href="#">互联网</a>
+	</div>
+
+</div>
+
+</body>
+</html>

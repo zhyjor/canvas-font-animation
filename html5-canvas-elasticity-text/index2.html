@@ -1,0 +1,240 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>HTML5 Canvas弹性文字动画DEMO演示</title>
+
+<style>
+body, html {
+	position: absolute;
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+	touch-action: none;
+	content-zooming: none;
+	background: #000;
+}
+
+canvas {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	user-select: none;
+	background: #000;
+}
+</style>
+
+</head>
+<body>
+
+<div></div>
+
+<script>
+"use strict";
+{
+	const txt = 'EXPANDED';
+	// 粘性，每次可以减小的抖动比例
+	const viscosity = 0.005;
+	// 刚性
+	const stiffness = 0.99;
+	class Point {
+        /**
+         *
+         * @param i 第几个文字
+         * @param x 在画布上x轴起始点的位置
+         * @param y 在画布上y轴起始点的位置
+         */
+		constructor (i, x, y) {
+			this.c = null;
+			this.x0 = x;
+			this.y0 = y;
+			this.x = x + Math.sin(i) * 100;
+			this.y = y + Math.cos(i) * 100;
+			this.vx = 0.0;
+			this.vy = 0.0;
+			this.a = 0.0;
+			this.s = 0.0;
+			this.p0 = this;
+			this.p1 = this;
+			this.t = 0;
+		}
+		// 画出单个文字内容
+		texture (c, color) {
+		    // 单个文字的canvas
+			this.c = document.createElement("canvas");
+			const ctx = this.c.getContext("2d");
+			this.c.width = this.c.height = 400;
+			ctx.font = "500px Arial Black, Arial";
+			ctx.fillStyle = color;
+			ctx.textAlign = "center";
+			ctx.fillText(c, 200, 385);
+		}
+		// 画出骨架，包括连接线和节点
+		drawSegment() {
+			ctx.beginPath();
+			ctx.strokeStyle = "#666";
+			ctx.moveTo(this.p0.x, this.p0.y);
+			ctx.lineTo(this.x, this.y);
+			ctx.lineTo(this.p1.x, this.p1.y);
+			ctx.stroke();
+			ctx.beginPath();
+			ctx.arc(this.x, this.y, 3, 0, 2 * Math.PI);
+			ctx.stroke();
+		}
+		draw () {
+			const fx = (this.x0 - this.x) * viscosity;
+			const fy = (this.y0 - this.y) * viscosity;
+			this.vx *= stiffness;
+			this.vy *= stiffness;
+			this.vx += fx;
+			this.vy += fy;
+			this.x += this.vx;
+			this.y += this.vy;
+			if (this.c !== null) {
+				ctx.beginPath();
+				// 锁定画布
+				ctx.save();
+				// 移动原点
+				ctx.translate(this.x, this.y);
+				// 上一节点和下一节点的位置距离
+				const dy = this.p1.x - this.p0.x;
+				const dx = this.p1.y - this.p0.y;
+                // 上一节点和下一节点的角度差
+				this.a = Math.atan2(dx, dy);
+				// 上一节点和下一节点的直线距离
+				this.s = Math.sqrt(dy * dy + dx * dx) / 2;
+				ctx.rotate(this.a);
+				// 画图的放置位置和占位大小
+				ctx.drawImage(this.c, -this.s * 0.5, -this.s * 0.5, this.s, this.s);
+				ctx.restore();
+			}
+		}
+	}
+	const points = [];
+	const canvas = {
+		init() {
+			this.elem = document.createElement("canvas");
+			document.body.appendChild(this.elem);
+			this.resize();
+			window.addEventListener("resize", () => this.resize(), false);
+			return this.elem.getContext("2d");
+		},
+		resize() {
+			this.width = this.elem.width = this.elem.offsetWidth;
+			this.height = this.elem.height = this.elem.offsetHeight;
+			let x = 0;
+			const sx = this.width / (txt.length + 1);
+			for (const p of points) {
+				p.x0 = x;
+				p.y0 = canvas.height / 2;
+				x += sx;
+			}
+		}
+	};
+	const ctx = canvas.init();
+	ctx.imageSmoothingEnabled = true;
+	const pointer = {
+	    // 手指在屏幕上的位置
+		x: 0,
+		y: 0,
+		dx: 0,
+		dy: 0,
+        // 被拖动的节点
+		drag: null,
+		over: null,
+		down(e, touch) {
+			this.move(e, touch);
+			if (this.over) {
+				this.dx = this.x - this.over.x;
+				this.dy = this.y - this.over.y;
+				this.drag = this.over;
+				canvas.elem.style.cursor = "move";
+			}
+		},
+        // 手指离开屏幕
+		up(e, touch) {
+			this.drag = null;
+			canvas.elem.style.cursor = "default";
+		},
+        // 手指移动
+		move(e, touch) {
+		    // 获取点击的位置
+			const pointer = touch ? e.targetTouches[0] : e;
+			this.x = pointer.clientX;
+			this.y = pointer.clientY;
+			this.over = null;
+			if (this.drag === null) {
+				for (const p of points) {
+					const dx = this.x - p.x;
+					const dy = this.y - p.y;
+					const d = Math.sqrt(dx * dx + dy * dy);
+					if (d < p.s * 0.5) {
+						canvas.elem.style.cursor = "pointer";
+						this.over = p;
+						break;
+					} else {
+						canvas.elem.style.cursor = "default";
+					}
+				}
+			}
+		},
+        // 绑定事件
+		init() {
+			window.addEventListener("mousedown", e => this.down(e, false), false);
+			window.addEventListener("touchstart", e => this.down(e, true), false);
+			window.addEventListener("mousemove", e => this.move(e, false), false);
+			canvas.elem.addEventListener("touchmove", e => this.move(e, true), false);
+			window.addEventListener("mouseup", e => this.up(e, false), false);
+			window.addEventListener("touchend", e => this.up(e, true), false);
+		}
+	};
+	{
+		let x = 0;
+		// 每个文字占用的画布宽度 = 画布宽度/（文字的个数+1）
+		const sx = canvas.width / (txt.length + 1);
+		// 初始化文字数组
+		for (let i = 0; i < txt.length + 2; i++) {
+		    // 生成文字的位置
+			points.push(new Point(i, x, canvas.height / 2));
+			x += sx;
+		}
+		// 初始化文字数组中的每一个文字的位置
+		for (let i = 1; i < txt.length + 1; i++) {
+			const p = points[i];
+			// 上一个节点
+			p.p0 = points[i - 1];
+			// 下一个节点
+			p.p1 = points[i + 1];
+			// 文字占用的宽度
+			p.s = sx;
+			// 画出一个文字
+			p.texture(txt.charAt(i - 1), i === 5 ? "#f80" : "#fff");
+		}
+	}
+	const run = () => {
+	    // debugger
+		requestAnimationFrame(run);
+		ctx.clearRect(0, 0, canvas.width, canvas.height);
+		for (const p of points) {
+		    // 被拖动的是哪一个
+			if (pointer.drag === p) {
+				p.x = pointer.x - pointer.dx;
+				p.y = pointer.y - pointer.dy;
+			}
+			p.draw();
+		}
+		for (const p of points) {
+			p.drawSegment();
+		}
+	}
+	pointer.init();
+    // debugger
+	run();	
+}
+</script>
+
+</body>
+</html>
+
