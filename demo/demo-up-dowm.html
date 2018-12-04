@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <style>
+        canvas {
+            border: 1px solid #ccc;
+        }
+    </style>
+<body>
+<canvas id="canvas" width="450" height="360"></canvas>
+<script>
+var canvas = document.getElementById("canvas"),
+    r = 250,
+    ctx = canvas.getContext("2d")
+ctx.height = 360
+ctx.width = 450
+img = new Image();
+var angleInDegrees = 0;
+img.src = "../1111.png";
+// img.onload = function() {
+    // ctx.drawImage(img, 0, 0);
+// }
+
+var moveToRight = function() {
+
+    ctx.drawImage(img, 0, 0);
+    ctx.globalCompositeOperation = "source-over";
+    ctx.font = "50px 黑体";
+    ctx.textAlign = "center";
+    ctx.fillStyle = "#000000";
+
+    console.log(r)
+    ctx.save()
+    if (r >= ctx.height / 2) {
+        r = r - 5;
+        ctx.fillText("textAlign=center", ctx.width / 2, r);
+    } else {
+
+        // ctx.translate(150, 200);
+        ctx.translate(ctx.width / 2, ctx.height / 2)
+
+        if (angleInDegrees > -85) {
+            angleInDegrees -= 4
+        }
+        ctx.rotate(angleInDegrees * Math.PI / 180);
+
+        ctx.fillText("textAlign=center", 150, 0);
+    }
+    ctx.restore()
+}
+setInterval(moveToRight, 10);
+</script>
+</body>
+</html>

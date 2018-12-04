@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<canvas id="canvas" width=500 height=300></canvas>
+<script>
+var canvasWidth;
+var canvasHeight;
+var interval = 20;
+var angleInDegrees = 0;
+
+
+function getCanvas(angleInDegrees) {
+    let c = document.createElement("canvas");
+    const ctx = c.getContext("2d");
+    c.width = c.height = 200;
+    ctx.font = "50px Arial Black, Arial";
+    ctx.fillStyle = 'red';
+    ctx.textAlign = "center";
+    ctx.save();
+
+    ctx.translate(200, 150);
+    ctx.rotate(angleInDegrees * Math.PI / 180);
+
+    ctx.fillStyle = '#f00';
+    ctx.font = '40px san-serif';
+    ctx.textBaseline = 'top';
+    ctx.fillText("Hello rotated", -10, -20);
+
+    ctx.restore();
+    return c
+}
+
+function init() {
+    var canvas = document.getElementById("canvas");
+    ctx = canvas.getContext('2d');
+    canvasWidth = canvas.width;
+    canvasHeight = canvas.height;
+    redraw();
+    // setInterval(function() {
+    //     redraw();
+    // }, interval);
+}
+
+init();
+
+
+function redraw() {
+
+    requestAnimationFrame(redraw)
+
+    angleInDegrees -= 10;
+    if (angleInDegrees >= 90) {
+        angleInDegrees = 0
+        return
+    }
+
+    ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+
+    ctx.beginPath();
+    ctx.rect(200, 150, 5, 5);
+    ctx.fill();
+
+    ctx.drawImage(getCanvas(angleInDegrees), 100, 100);
+
+    // ctx.save();
+
+    // ctx.translate(200, 150);
+    // ctx.rotate(angleInDegrees * Math.PI / 180);
+    //
+    // ctx.fillStyle = '#f00';
+    // ctx.font = '40px san-serif';
+    // ctx.textBaseline = 'top';
+    // ctx.fillText("Hello rotated", -10, -20);
+
+    // ctx.restore();
+}
+</script>
+</body>
+</html>

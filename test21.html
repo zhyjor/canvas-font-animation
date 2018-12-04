@@ -30,10 +30,10 @@ function redraw() {
 
     requestAnimationFrame(redraw)
 
-    angleInDegrees += 5;
+    angleInDegrees += 10;
     if(angleInDegrees>=90){
         // angleInDegrees =0
-        return
+        // return
     }
 
     ctx.clearRect(0, 0, canvasWidth, canvasHeight);
@@ -50,7 +50,7 @@ function redraw() {
     ctx.fillStyle = '#f00';
     ctx.font = '40px san-serif';
     ctx.textBaseline = 'top';
-    ctx.fillText("Hello rotated", 0, 0);
+    ctx.fillText("Hello rotated", -10, -20);
 
     ctx.restore();
 
